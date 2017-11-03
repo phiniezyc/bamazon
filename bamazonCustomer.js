@@ -1,9 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 
-
-// 5. Then create a Node application called `bamazonCustomer.js`. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
-
+//Used an Immediately Invoked Function Expression to start game immediately and to keep global space clean
 (function startApp() {
   const connection = mysql.createConnection({
     host: "localhost",
@@ -30,7 +28,7 @@ const inquirer = require("inquirer");
       if (err) throw err;
       // console.log(res);
       // Displays Product Info
-      for (var i = 0; i < res.length; i++) {
+      for (let i = 0; i < res.length; i++) {
         console.log("ID: " + res[i].id + " | " + "ITEM: " + res[i].product_name + " | " + "PRICE: " + res[i].price);
         console.log('-------------------------------------');
       }
