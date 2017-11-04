@@ -41,9 +41,9 @@ const connection = mysql.createConnection({
       // Displays Product Info
       for (let i = 0; i < res.length; i++) {
         console.log("ID: " + res[i].id + " | " + "ITEM: " + res[i].product_name + " | " + "PRICE: " + res[i].price);
-        console.log('-------------------------------------');
+        console.log("-------------------------------------");
       }
-      connection.end();
+      //connection.end();
       customerSelection();
     });
   }
@@ -53,23 +53,25 @@ const connection = mysql.createConnection({
   function customerSelection() {
     inquirer
       .prompt([{
-          name: 'id',
-          type: 'input',
-          message: 'Please select a product by id?'
+          name: "id",
+          type: "input",
+          message: "Please select a product by id?"
         },
         {
-          name: 'quantity',
-          type: 'input',
-          message: 'How many would you like to buy'
+          name: "quantity",
+          type: "input",
+          message: "How many would you like to buy"
         }
 
       ])
       .then(function (answer) {
         connection.query("SELECT * FROM products", function (err, res) {
+          if (err) throw err;
           console.log("You Selected Item: " + answer.id + " " + " & a Quantity Of: " + answer.quantity);
           let quantity;
           let product;
           let price;
+          
           for (let i = 0; i < res.length; i++) {
             if (res[i].id === parseInt(answer.id)) {
               quantity = res[i].stock_quantity;
@@ -79,20 +81,20 @@ const connection = mysql.createConnection({
           }
           if (quantity >= parseInt(answer.quantity) && (quantity > 0) && (answer.quantity > 0)) {
 
-            connection.query('UPDATE products SET ? WHERE ?', [{
+            connection.query("UPDATE products SET ? WHERE ?", [{
                 stock_quantity: (quantity - answer.quantity),
               }, {
                 id: answer.id
               }],
               function (err) {
                 if (err) throw err;
-                console.log('INVOICE OF ' + answer.quantity + ' ' + product);
-                console.log('TOTAL COST ' + '$' + (answer.quantity * price));
+                console.log("INVOICE: " + answer.quantity + "x " + " product");
+                console.log("TOTAL: " + "$" + (answer.quantity * price));
               });
 
 
           } else {
-            console.log('INSUFFICIENT QUANTITY IN STOCK!');
+            console.log("INSUFFICIENT QUANTITY IN STOCK!");
           }
 
         });
@@ -107,33 +109,6 @@ const connection = mysql.createConnection({
 
 
 
-
-
-// 6. The app should then prompt users with two messages.
-
-//    * The first should ask them the ID of the product they would like to buy.
-// function customerSelectsProductToBuy() {
-//   inquirer
-//     .prompt({
-//       name: "productToBuy",
-//       type: "input",
-//       message: "Which item would you like to purchase?\n",
-//     })
-//     .then(function(answer) {
-//       let chosenItem;
-//       for (let i = 0; i < res.length; i++) {
-//         if (answer.productToBuy.toLowerCase() === res[i].product_name) {
-//           chosenItem = res[i].product_name;
-//           console.log("you've selected: " + chosenItem);
-//         }
-//         else {
-//           console.log("you've not make a correct selection");
-//         }
-//       }
-
-//     });
-// }
-//    * The second message should ask how many units of the product they would like to buy.
 
 // 7. Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.
 
