@@ -1,16 +1,16 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 
-// const connection = mysql.createConnection({
-//   host: "localhost",
-//   port: 3306,
+const connection = mysql.createConnection({
+  host: "localhost",
+  port: 3306,
 
-//   // username
-//   user: "root",
+  // username
+  user: "root",
 
-//   password: "",
-//   database: "bamazon_DB"
-// });
+  password: "",
+  database: "bamazon_DB"
+});
 
 //Used an Immediately Invoked Function Expression to start game immediately and to keep global space clean
 (function startApp() {
@@ -43,44 +43,63 @@ const inquirer = require("inquirer");
         console.log("ID: " + res[i].id + " | " + "ITEM: " + res[i].product_name + " | " + "PRICE: " + res[i].price);
         console.log('-------------------------------------');
       }
-      //connection.end();
+      connection.end();
       customerSelection();
     });
   }
 
 
 
-
   function customerSelection() {
     inquirer
-        .prompt([{
-            name: 'id',
-            type: 'input',
-            message: 'Please select a product by id?'
+      .prompt([{
+          name: 'id',
+          type: 'input',
+          message: 'Please select a product by id?'
         },
-            {
-                name: 'quantity',
-                type: 'input',
-                message: 'How many would you like to buy'
-            }
+        {
+          name: 'quantity',
+          type: 'input',
+          message: 'How many would you like to buy'
+        }
 
-        ])
-        .then(function(answer){
-            let quantity;
-            let product;
-            let price;
-            for (let i = 0; i < res.length; i ++){
-
-                if (res[i].item_id === parseInt(answer.productId)) {
-                    cQuant = res[i].stock_quantity;
-                    cProduct = res[i].product_name;
-                    cPrice = res[i].price
-                }
+      ])
+      .then(function (answer) {
+        connection.query("SELECT * FROM products", function (err, res) {
+          console.log("You Selected Item: " + answer.id + " " + " & a Quantity Of: " + answer.quantity);
+          let quantity;
+          let product;
+          let price;
+          for (let i = 0; i < res.length; i++) {
+            if (res[i].id === parseInt(answer.id)) {
+              quantity = res[i].stock_quantity;
+              product = res[i].product_name;
+              price = res[i].price;
             }
+          }
+          if (quantity >= parseInt(answer.quantity) && (quantity > 0) && (answer.quantity > 0)) {
+
+            connection.query('UPDATE products SET ? WHERE ?', [{
+                stock_quantity: (quantity - answer.quantity),
+              }, {
+                id: answer.id
+              }],
+              function (err) {
+                if (err) throw err;
+                console.log('INVOICE OF ' + answer.quantity + ' ' + product);
+                console.log('TOTAL COST ' + '$' + (answer.quantity * price));
+              });
+
+
+          } else {
+            console.log('INSUFFICIENT QUANTITY IN STOCK!');
+          }
 
         });
 
-}
+      });
+
+  }
 
 
 
