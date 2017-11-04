@@ -1,19 +1,11 @@
-const mysql = require("mysql");
-const inquirer = require("inquirer");
+// const mysql = require("mysql");
+// const inquirer = require("inquirer");
 
-const connection = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-
-  // username
-  user: "root",
-
-  password: "",
-  database: "bamazon_DB"
-});
 
 //Used an Immediately Invoked Function Expression to start game immediately and to keep global space clean
 (function startApp() {
+  const mysql = require("mysql");
+  const inquirer = require("inquirer");
   const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
