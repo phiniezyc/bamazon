@@ -1,18 +1,10 @@
-// const mysql = require("mysql");
-// const inquirer = require("inquirer");
-
-
-//Used an Immediately Invoked Function Expression to start game immediately and to keep global space clean
 (function startApp() {
   const mysql = require("mysql");
   const inquirer = require("inquirer");
   const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
-
-    // username
     user: "root",
-
     password: "",
     database: "bamazon_DB"
   });
@@ -21,9 +13,7 @@
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     displayProductsForSale();
-
   });
-
 
   function displayProductsForSale() {
     console.log("\nPRODUCTS FOR SALE:\n");
@@ -35,12 +25,9 @@
         console.log("ID: " + res[i].id + " | " + "ITEM: " + res[i].product_name + " | " + "PRICE: " + res[i].price);
         console.log("-------------------------------------");
       }
-      //connection.end();
       customerSelection();
     });
   }
-
-
 
   function customerSelection() {
     inquirer
@@ -54,16 +41,16 @@
           type: "input",
           message: "How many would you like to buy"
         }
-
       ])
       .then(function (answer) {
         connection.query("SELECT * FROM products", function (err, res) {
           if (err) throw err;
           console.log("You Selected Item: " + answer.id + " " + " & a Quantity Of: " + answer.quantity);
+
           let quantity;
           let product;
           let price;
-          
+          //Grabs Data from the database to use for calculations
           for (let i = 0; i < res.length; i++) {
             if (res[i].id === parseInt(answer.id)) {
               quantity = res[i].stock_quantity;
@@ -71,8 +58,8 @@
               price = res[i].price;
             }
           }
+          //If database product's stock is greater than what customer asked for and greater than zero, then subtract asked for quantity from database, otherwise don't do anything to the database and show user you are out of that product!
           if (quantity >= parseInt(answer.quantity) && (quantity > 0) && (answer.quantity > 0)) {
-
             connection.query("UPDATE products SET ? WHERE ?", [{
                 stock_quantity: (quantity - answer.quantity),
               }, {
@@ -80,32 +67,15 @@
               }],
               function (err) {
                 if (err) throw err;
-                console.log("INVOICE: " + answer.quantity + "x " + " product");
+                console.log("INVOICE: " + answer.quantity + "x " + product);
                 console.log("TOTAL: " + "$" + (answer.quantity * price));
               });
-
-
+            connection.end();
           } else {
             console.log("INSUFFICIENT QUANTITY IN STOCK!");
+            connection.end();
           }
-
         });
-
       });
-
   }
-
-
-
 }());
-
-
-
-
-// 7. Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.
-
-//    * If not, the app should log a phrase like `Insufficient quantity!`, and then prevent the order from going through.
-
-// 8. However, if your store _does_ have enough of the product, you should fulfill the customer's order.
-//    * This means updating the SQL database to reflect the remaining quantity.
-//    * Once the update goes through, show the customer the total cost of their purchase.
