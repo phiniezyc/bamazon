@@ -34,7 +34,7 @@
       .prompt([{
           name: "id",
           type: "input",
-          message: "Please select a product by id?"
+          message: "Please select product by Id?"
         },
         {
           name: "quantity",
@@ -45,7 +45,7 @@
       .then(function (answer) {
         connection.query("SELECT * FROM products", function (err, res) {
           if (err) throw err;
-          console.log("You Selected Item: " + answer.id + " " + " & a Quantity Of: " + answer.quantity);
+          console.log("Selected Item ID: " + answer.id + " " + " x " + answer.quantity);
 
           let quantity;
           let product;
